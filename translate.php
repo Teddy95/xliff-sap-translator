@@ -8,6 +8,13 @@
 function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 	$origEncoding = mb_detect_encoding($sourceText);
 	$sourceText = mb_convert_encoding($sourceText, 'UTF-8');
+
+	/************************************************************************/
+	/******** BEI AKTIVIERUNG SCHLEIFE AUF EINEN DURCHLAUF SETZEN!!! ********/
+	/*$apiLink = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" . $sourceLanguage . "&tl=" . $targetLanguage . "&dt=t&q=" . urlencode($sourceText);
+	$apiObject = json_decode(file_get_contents($apiLink));
+	$target = $apiObject[0][0][0];*/
+	/************************************************************************/
 	$target = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.';
 	$target = mb_convert_encoding($target, $origEncoding);
 
@@ -35,9 +42,9 @@ foreach ($files as $file) {
 			$source = $xmlSource->file[$i]->body->{'trans-unit'}[$n]->source;
 			$target = trim($xmlSource->file[$i]->body->{'trans-unit'}[$n]->target);
 
-			if (isset($xmlSource->file[$i]->body->{'trans-unit'}[$n]->target)) {
+			/*if (isset($xmlSource->file[$i]->body->{'trans-unit'}[$n]->target)) {
 				$xmlSource->file[$i]->body->{'trans-unit'}[$n]->target->addChild('target');
-			}
+			}*/
 
 			// Translate source
 			if (empty($target)) {
