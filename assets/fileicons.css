@@ -1,0 +1,13 @@
+.file-load {
+	color: inherit;
+}
+.file-wait {
+	color: inherit;
+	display: none;
+}
+.file-ok {
+	color: green;
+}
+.file-error {
+	color: red;
+}
