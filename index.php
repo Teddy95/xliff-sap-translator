@@ -1,16 +1,25 @@
+<?php
+/**
+ * Author: Andre Sieverding
+ * Date: 05.09.2018
+ */
+?>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8" />
 		<title>Translate</title>
 		<link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css" />
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+		<link rel="stylesheet" type="text/css" href="./assets/fileicons.css" />
 		<script type="text/javascript" language="javascript" src="./assets/jquery-3.3.1.min.js"></script>
+		<meta name="robots" content="noindex,nofollow" />
 	</head>
 	<body>
 		<div class="container">
 			<br />
-			<a class="btn btn-primary" href="./translate.php">Übersetzung beginnen...</a>
-			<a class="btn btn-secondary" href="./view.php">Ergebnisse anzeigen...</a>
+			<button type="button" id="startTranslating" class="btn btn-primary">Übersetzung beginnen...</button>
+			<a class="btn btn-secondary" href="./view.php" target="_blank">Ergebnisse anzeigen...</a>
 			<br />
 			<br />
 			<?php
@@ -38,7 +47,7 @@
 				}
 			}
 
-			$costs = ($chars / 1000000) * 20;
+			$costs = ($chars / 500) * 0.01;
 			?>
 			<div class="row">
 				<div class="col">
@@ -46,7 +55,7 @@
 					<ul>
 						<?php
 						foreach ($files as $file) {
-							echo "<li>" . basename($file) . "</li>";
+							echo "<li data-file='" . $file . "'>" . basename($file) . " <i class='fa fa-spinner file-wait'></i></li>";
 						}
 						?>
 					</ul>
@@ -80,8 +89,87 @@
 					<p>
 						Kosten ca.: <b><?=number_format($costs, 2, ',', '.');?></b> EUR (20,00 € / 1 Mio. Zeichen)
 					</p>
+					<hr />
+					<p>
+						<form>
+							<div class="form-group">
+								<label for="exampleInputEmail1"><b>DeepL Pro API Schlüssel</b></label>
+								<input type="text" class="form-control" id="apikey" />
+								<small class="form-text text-muted">Der API Schlüssel wird benötigt, um auf den Service von DeepL zuzugreifen!</small>
+							</div>
+							<div class="form-group form-check">
+								<input type="checkbox" class="form-check-input" id="emptyTarget" checked="checked" />
+								<label class="form-check-label" for="emptyTarget"><code>/target</code>-Verzeichnis vor dem Übersetzen leeren</label>
+							</div>
+						</form>
+					</p>
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript" language="javascript">
+			$(document).ready(function () {
+				var files = [<?php
+					for ($a = 0, $b = count($files); $a < $b; $a++) {
+						$item = "'" . $files[$a] . "'";
+
+						if ($a + 1 < $b) {
+							$item .= ',';
+						}
+
+						echo $item;
+					}
+				?>];
+
+				$('#startTranslating').off();
+				$('#startTranslating').click(function () {
+					if ($('#emptyTarget').prop('checked')) {
+						$.ajax({
+							url: './unlink_target_files.php',
+							async: false,
+							cache: false,
+							timeout: 0,
+							type: 'POST'
+						});
+					}
+
+					files.forEach(function (element) {
+						$('li[data-file="' + element + '"]').children('i').removeClass('fa-check file-ok fa-times file-error');
+						$('li[data-file="' + element + '"]').children('i').addClass('fa-spinner file-wait');
+					});
+
+					files.forEach(function (element) {
+						$('li[data-file="' + element + '"]').children('i').removeClass('file-wait');
+						$('li[data-file="' + element + '"]').children('i').addClass('file-load fa-spin');
+
+						$.ajax({
+							url: './translate.php',
+							async: false,
+							cache: false,
+							timeout: 0,
+							type: 'POST',
+							data: {
+								file: element,
+								apikey: $('#apikey').val()
+							},
+							success: function (data) {
+								if (data == 1) {
+									$('li[data-file="' + element + '"]').children('i').removeClass('fa-spin fa-spinner file-load');
+									$('li[data-file="' + element + '"]').children('i').addClass('fa-check file-ok');
+								} else {
+									$('li[data-file="' + element + '"]').children('i').removeClass('fa-spin fa-spinner file-load');
+									$('li[data-file="' + element + '"]').children('i').addClass('fa-times file-error');
+								}
+							},
+							error: function (data) {
+								$('li[data-file="' + element + '"]').children('i').removeClass('fa-spin fa-spinner file-load');
+								$('li[data-file="' + element + '"]').children('i').addClass('fa-times file-error');
+							}
+						});
+					});
+
+					return false;
+				});
+			});
+		</script>
 	</body>
 </html>

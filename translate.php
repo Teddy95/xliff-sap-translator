@@ -4,6 +4,16 @@
  * Date: 05.09.2018
  */
 
+// Deactivate error reporting
+/*error_reporting(0);
+ini_set('display_errors', 0);*/
+
+// Ignoring user abort, so the script can be executed completly
+//ignore_user_abort(true);
+
+// Deactivate timeout
+set_time_limit(0);
+
 // Function for translating source text using Google Translate API / DeepL API
 function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 	$origEncoding = mb_detect_encoding($sourceText);
@@ -25,10 +35,10 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 	return $target;
 }
 
-// Read files from source file directory
-$files = glob('./src/*.xlf');
+if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) && !empty($_POST['apikey']) && file_exists($_POST['file'])) {
+	// Read files from source file directory
+	$file = $_POST['file'];
 
-foreach ($files as $file) {
 	// Get xml source from file
 	$xmlSource = new SimpleXMLElement(file_get_contents($file));
 
@@ -63,19 +73,8 @@ foreach ($files as $file) {
 	$fileHandle = fopen($newFile, 'w');
 	fwrite($fileHandle, $output);
 	fclose($fileHandle);
+
+	echo 1;
+} else {
+	echo 0;
 }
-?>
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<title>Translate</title>
-		<link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css" />
-	</head>
-	<body>
-		<div class="container">
-			<br />
-			<a class="btn btn-primary" href="./view.php">Ergebnisse anzeigen...</a>
-		</div>
-	</body>
-</html>

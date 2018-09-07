@@ -13,6 +13,7 @@ $files = glob('./target/*.xlf');
 		<meta charset="utf-8" />
 		<title>Translate</title>
 		<link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css" />
+		<meta name="robots" content="noindex,nofollow" />
 	</head>
 	<body>
 		<table class="table table-striped table-dark">
