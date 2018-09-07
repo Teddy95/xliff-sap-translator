@@ -33,8 +33,8 @@ foreach ($files as $file) {
 	$xmlSource = new SimpleXMLElement(file_get_contents($file));
 
 	for ($i = 0, $j = count($xmlSource->file); $i < $j; $i++) {
-		$srcLang = $xmlSource->file[$i]->attributes()->{'source-language'};
-		$targetLang = $xmlSource->file[$i]->attributes()->{'target-language'};
+		$srcLang = (string)$xmlSource->file[$i]->attributes()->{'source-language'};
+		$targetLang = (string)$xmlSource->file[$i]->attributes()->{'target-language'};
 
 		for ($n = 0, $m = count($xmlSource->file[$i]->body->{'trans-unit'}); $n < $m; $n++) {
 			// Extract max char width, source text and target text from xlm structure
@@ -59,7 +59,7 @@ foreach ($files as $file) {
 
 	// Save new xml structure into file
 	$output = $xmlSource->asXML();
-	$newFile = './target/' . substr($file, 6);
+	$newFile = './target/' . basename($file);
 	$fileHandle = fopen($newFile, 'w');
 	fwrite($fileHandle, $output);
 	fclose($fileHandle);
