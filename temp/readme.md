@@ -1,3 +1,3 @@
 # Hi
 
-Here you can put down some .xlf files for translating.
+This is a temporary cache folder.
