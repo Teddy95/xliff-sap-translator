@@ -11,3 +11,9 @@
 .file-error {
 	color: red;
 }
+.active-file {
+	font-weight: bold;
+}
+.after {
+	display: none;
+}

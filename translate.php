@@ -63,6 +63,30 @@ if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) &
 				// Write down new translated text back into xml structure
 				$xmlSource->file[$i]->body->{'trans-unit'}[$n]->target = $target;
 				$xmlSource->file[$i]->body->{'trans-unit'}[$n]->target->addAttribute('state', 'needs-review-translation');
+
+				// Write progessstatus into text file in /temp directory
+				if (file_exists('./temp/all.txt')) {
+					$progstatAll = (int)file_get_contents('./temp/all.txt');
+				} else {
+					$progstatAll = 0;
+				}
+
+				if (file_exists('./temp/' . explode('.', basename($file))[0] . '.txt')) {
+					$progstat = (int)file_get_contents('./temp/' . explode('.', basename($file))[0] . '.txt');
+				} else {
+					$progstat = 0;
+				}
+
+				$progstatAll++;
+				$progstat++;
+				$progFileAll = './temp/all.txt';
+				$progFileHandleAll = fopen($progFileAll, 'w');
+				fwrite($progFileHandleAll, (string)$progstatAll);
+				fclose($progFileHandleAll);
+				$progFile = './temp/' . explode('.', basename($file))[0] . '.txt';
+				$progFileHandle = fopen($progFile, 'w');
+				fwrite($progFileHandle, (string)$progstat);
+				fclose($progFileHandle);
 			}
 		}
 	}

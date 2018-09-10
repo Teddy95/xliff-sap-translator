@@ -16,11 +16,13 @@
 		<meta name="robots" content="noindex,nofollow" />
 	</head>
 	<body>
+		<div id="cronId" style="display: none;"></div>
 		<div class="container">
 			<?php
 			$files = glob('./src/*.xlf');
 			$chars = 0;
 			$texts = 0;
+			$fileTexts = array();
 
 			if (count($files) > 0) {
 				foreach ($files as $file) {
@@ -37,6 +39,7 @@
 
 							if (empty($target)) {
 								$texts++;
+								$fileTexts[$file]++;
 								$chars += strlen($source);
 							}
 						}
@@ -49,8 +52,9 @@
 					<div class="col-12">
 						<br />
 						<h1>XLIFF SAP Translator</h1>
-						<button type="button" id="startTranslating" class="btn btn-primary"><i class="fa fa-language"></i> Übersetzung beginnen</button>
-						<a class="btn btn-secondary" href="./view.php" target="_blank"><i class="fa fa-eye"></i> Ergebnisse anzeigen</a>
+						<button type="button" id="startTranslating" class="btn btn-primary before"><i class="fa fa-language"></i> Übersetzung beginnen</button>
+						<a class="btn btn-secondary after" href="./index.php"><i class="fa fa-broom"></i> Neu laden</a>
+						<a class="btn btn-primary after" href="./view.php" target="_blank"><i class="fa fa-eye"></i> Ergebnisse anzeigen</a>
 						<br />
 						<br />
 					</div>
@@ -58,8 +62,8 @@
 						<h3>Zu übersetzende Dateien:</h3>
 						<ul>
 							<?php
-							foreach ($files as $file) {
-								echo "<li data-file='" . $file . "'>" . basename($file) . " <i class='fa fa-spinner file-wait'></i></li>";
+							for ($i = 0, $j = count($files); $i < $j; $i++) {
+								echo "<li data-file='" . $files[$i] . "' data-file-basename='" . explode('.', basename($files[$i]))[0] . "' data-filenumber='" . ($i + 1) . "' data-file-texts='" . $fileTexts[$files[$i]] . "'>" . basename($files[$i]) . " <i class='fa fa-spinner file-wait'></i></li>";
 							}
 							?>
 						</ul>
@@ -94,19 +98,36 @@
 							Kosten ca.: <b><?=number_format($costs, 2, ',', '.');?></b> EUR (20,00 € / 1 Mio. Zeichen)
 						</p>
 						<hr />
-						<p>
-							<form>
-								<div class="form-group">
-									<label for="exampleInputEmail1"><b>DeepL Pro API Schlüssel</b></label>
-									<input type="text" class="form-control" id="apikey" />
-									<small class="form-text text-muted">Der API Schlüssel wird benötigt, um auf den Service von DeepL zuzugreifen!</small>
-								</div>
-								<div class="form-group form-check">
-									<input type="checkbox" class="form-check-input" id="emptyTarget" checked="checked" />
-									<label class="form-check-label" for="emptyTarget"><code>/target</code>-Verzeichnis vor dem Übersetzen leeren</label>
-								</div>
-							</form>
-						</p>
+						<div class="before change">
+							<p>
+								<form>
+									<div class="form-group">
+										<label for="exampleInputEmail1"><b>DeepL Pro API Schlüssel</b></label>
+										<input type="text" class="form-control" id="apikey" />
+										<small class="form-text text-muted">Der API Schlüssel wird benötigt, um auf den Service von DeepL zuzugreifen!</small>
+									</div>
+									<div class="form-group form-check">
+										<input type="checkbox" class="form-check-input" id="emptyTarget" checked="checked" />
+										<label class="form-check-label" for="emptyTarget"><code>/target</code>-Verzeichnis vor dem Übersetzen leeren</label>
+									</div>
+								</form>
+							</p>
+						</div>
+						<div class="after change">
+							<p>
+								Fortschritt aktuelle Datei
+							</p>
+							<div class="progress">
+								<div id="progstatFile" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">0%</div>
+							</div>
+							<br />
+							<p>
+								Fortschritt Gesamt
+							</p>
+							<div class="progress">
+								<div id="progstatAll" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">0%</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<?php
@@ -128,7 +149,7 @@
 		</div>
 		<script type="text/javascript" language="javascript">
 			$(document).ready(function () {
-				var files = [<?php
+				files = [<?php
 					for ($a = 0, $b = count($files); $a < $b; $a++) {
 						$item = "'" . $files[$a] . "'";
 
@@ -142,30 +163,102 @@
 
 				$('#startTranslating').off();
 				$('#startTranslating').click(function () {
-					if (confirm("Übersetzung starten? Dieser Vorgang kann nicht abgerochen werden und wird einige Zeit zur Ausführung benötigen!")) {
-						if ($('#emptyTarget').prop('checked')) {
-							$.ajax({
-								url: './unlink_target_files.php',
-								type: 'POST'
+					if ($('#apikey').val() != '') {
+						if (confirm("Übersetzung starten? Dieser Vorgang kann nicht abgerochen werden und wird einige Zeit zur Ausführung benötigen!")) {
+							$('#startTranslating').attr('disabled', 'disabled').addClass('disabled');
+							$('.before.change').hide();
+							$('.after.change').show();
+							clearTemp();
+							updateProg();
+
+							if ($('#emptyTarget').prop('checked')) {
+								unlinkTargetFiles();
+							}
+
+							files.forEach(function (element) {
+								$('li[data-file="' + element + '"]').children('i').removeClass('fa-check file-ok fa-times file-error');
+								$('li[data-file="' + element + '"]').children('i').addClass('fa-spinner file-wait');
 							});
+
+							execTranslations(files);
+							setCron();
 						}
-
-						files.forEach(function (element) {
-							$('li[data-file="' + element + '"]').children('i').removeClass('fa-check file-ok fa-times file-error');
-							$('li[data-file="' + element + '"]').children('i').addClass('fa-spinner file-wait');
-						});
-
-						execTranslations(files);
+					} else {
+						$('#apikey').addClass('is-invalid');
+						$('#apikey').focus();
 					}
 
 					return false;
 				});
 			});
 
+			function setCron () {
+				$('#cronId').attr('data-cronid', setInterval("updateProg()", (2 * 1000)));
+			}
+
+			function unsetCron () {
+				clearInterval($('#cronId').attr('data-cronid'));
+			}
+
+			function clearTemp () {
+				$.ajax({
+					url: './clear_temp.php',
+					type: 'POST'
+				});
+			}
+
+			function unlinkTargetFiles () {
+				$.ajax({
+					url: './unlink_target_files.php',
+					type: 'POST'
+				});
+			}
+
+			function updateProg (files) {
+				$.ajax({
+					url: './get_progstat.php',
+					type: 'POST',
+					data: {
+						file: 'all.txt'
+					},
+					success: function (data) {
+						var progstatAll = <?=$texts;?>;
+						progstatAll = Math.ceil(data / progstatAll * 100);
+
+						$('#progstatAll').attr('aria-valuenow', progstatAll);
+						$('#progstatAll').attr('style', 'width: ' + progstatAll + '%;');
+						$('#progstatAll').html(progstatAll + '%');
+					},
+					error: function (data) {
+						//
+					}
+				});
+
+				$.ajax({
+					url: './get_progstat.php',
+					type: 'POST',
+					data: {
+						file: $('li.active-file').attr('data-file-basename') + '.txt'
+					},
+					success: function (data) {
+						var progstat = $('li.active-file').attr('data-file-texts');
+						progstat = Math.ceil(data / progstat * 100);
+
+						$('#progstatFile').attr('aria-valuenow', progstat);
+						$('#progstatFile').attr('style', 'width: ' + progstat + '%;');
+						$('#progstatFile').html(progstat + '%');
+					},
+					error: function (data) {
+						//
+					}
+				});
+			}
+
 			function execTranslations (files) {
 				var fileCount = 0;
 
 				function execTranslation () {
+					$('li[data-file="' + files[fileCount] + '"]').addClass('active-file');
 					$('li[data-file="' + files[fileCount] + '"]').children('i').removeClass('file-wait');
 					$('li[data-file="' + files[fileCount] + '"]').children('i').addClass('file-load fa-spin');
 
@@ -191,10 +284,17 @@
 							$('li[data-file="' + files[fileCount] + '"]').children('i').addClass('fa-times file-error');
 						},
 						complete: function (data) {
+							$('li[data-file="' + files[fileCount] + '"]').removeClass('active-file');
+							
 							if (fileCount < files.length) {
 								fileCount++;
 								execTranslation();
 							} else {
+								$('li[data-filenumber="1"]').addClass('active-file').css('font-weight', 'normal');
+								unsetCron();
+								updateProg();
+								$('.before').hide();
+								$('.after').show();
 								alert("Übersetzung abgeschlossen!")
 							}
 						}
