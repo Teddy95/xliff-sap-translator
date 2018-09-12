@@ -1,0 +1,24 @@
+.file-load {
+	color: inherit;
+}
+.file-wait {
+	color: inherit;
+	display: none;
+}
+.file-ok {
+	color: green;
+}
+.file-error {
+	color: red;
+}
+.active-file {
+	font-weight: bold;
+}
+.after {
+	display: none;
+}
+ul.listing {
+	height: 400px;
+	overflow: auto;
+	border: 3px dashed #666666;
+}
