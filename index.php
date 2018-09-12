@@ -3,6 +3,10 @@
  * Author: Andre Sieverding
  * Date: 05.09.2018
  */
+
+// Deactivate error reporting
+error_reporting(0);
+ini_set('display_errors', 0);
 ?>
 <!DOCTYPE html>
 <html>
@@ -11,7 +15,7 @@
 		<title>Translate</title>
 		<link rel="stylesheet" type="text/css" href="./assets/bootstrap.min.css" />
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
-		<link rel="stylesheet" type="text/css" href="./assets/fileicons.css" />
+		<link rel="stylesheet" type="text/css" href="./assets/xliff.css" />
 		<script type="text/javascript" language="javascript" src="./assets/jquery-3.3.1.min.js"></script>
 		<meta name="robots" content="noindex,nofollow" />
 	</head>
@@ -60,7 +64,7 @@
 					</div>
 					<div class="col">
 						<h3>Zu übersetzende Dateien:</h3>
-						<ul>
+						<ul class="listings">
 							<?php
 							for ($i = 0, $j = count($files); $i < $j; $i++) {
 								echo "<li data-file='" . $files[$i] . "' data-file-basename='" . explode('.', basename($files[$i]))[0] . "' data-filenumber='" . ($i + 1) . "' data-file-texts='" . $fileTexts[$files[$i]] . "'>" . basename($files[$i]) . " <i class='fa fa-spinner file-wait'></i></li>";
