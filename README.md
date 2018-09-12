@@ -7,3 +7,5 @@ Translate .xlf files using DeepL Translator API for SAP
 4. Locate to the website (directory) with your browser
 5. Start automatically translating
 6. Your ready translated .xlf files are now in the `/target` folder
+
+### Tested successfully with DeepL Pro API v1 and SAP NetWeaver Version 7400.3.12.1129
