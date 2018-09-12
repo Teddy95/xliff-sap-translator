@@ -27,6 +27,8 @@ ini_set('display_errors', 0);
 			$chars = 0;
 			$texts = 0;
 			$fileTexts = array();
+			$srcLang = array();
+			$targetLang = array();
 
 			if (count($files) > 0) {
 				foreach ($files as $file) {
@@ -34,8 +36,13 @@ ini_set('display_errors', 0);
 					$xmlSource = new SimpleXMLElement(file_get_contents($file));
 
 					for ($i = 0, $j = count($xmlSource->file); $i < $j; $i++) {
-						$srcLang = (string)$xmlSource->file[$i]->attributes()->{'source-language'};
-						$targetLang = (string)$xmlSource->file[$i]->attributes()->{'target-language'};
+						if (!in_array((string)$xmlSource->file[$i]->attributes()->{'source-language'}, $srcLang)) {
+							$srcLang[] = (string)$xmlSource->file[$i]->attributes()->{'source-language'};
+						}
+
+						if (!in_array((string)$xmlSource->file[$i]->attributes()->{'target-language'}, $targetLang)) {
+							$targetLang[] = (string)$xmlSource->file[$i]->attributes()->{'target-language'};
+						}
 
 						for ($n = 0, $m = count($xmlSource->file[$i]->body->{'trans-unit'}); $n < $m; $n++) {
 							$source = $xmlSource->file[$i]->body->{'trans-unit'}[$n]->source;
@@ -91,8 +98,28 @@ ini_set('display_errors', 0);
 								'fr-FR' => 'Französisch'
 							);
 							?>
-							Quellsprache: <b><?=$langs[$srcLang];?></b><br />
-							Zielsprache: <b><?=$langs[$targetLang];?></b>
+							Quellsprache: <b>
+								<?php
+								for ($i = 0, $j = count($srcLang); $i < $j; $i++) {
+									echo $langs[$srcLang[$i]];
+
+									if ($j - 1 != $i) {
+										echo '; ';
+									}
+								}
+								?>
+								</b><br />
+							Zielsprache: <b>
+								<?php
+								for ($i = 0, $j = count($targetLang); $i < $j; $i++) {
+									echo $langs[$targetLang[$i]];
+
+									if ($j - 1 != $i) {
+										echo '; ';
+									}
+								}
+								?>
+								</b>
 						</p>
 						<p>
 							Anzahl Texte: <b><?=number_format($texts, 0, ',', '.');?></b><br />
@@ -168,7 +195,7 @@ ini_set('display_errors', 0);
 				$('#startTranslating').off();
 				$('#startTranslating').click(function () {
 					if ($('#apikey').val() != '') {
-						if (confirm("Übersetzung starten? Dieser Vorgang kann nicht abgerochen werden und wird einige Zeit zur Ausführung benötigen!")) {
+						if (confirm("Übersetzung kostenpflichtig starten? Dieser Vorgang kann nicht abgerochen werden und wird einige Zeit zur Ausführung benötigen!")) {
 							$('#startTranslating').attr('disabled', 'disabled').addClass('disabled');
 							$('.before.change').hide();
 							$('.after.change').show();
@@ -197,7 +224,7 @@ ini_set('display_errors', 0);
 			});
 
 			function setCron () {
-				$('#cronId').attr('data-cronid', setInterval("updateProg()", (2 * 1000)));
+				$('#cronId').attr('data-cronid', setInterval("updateProg()", (1 * 1000)));
 			}
 
 			function unsetCron () {
@@ -232,9 +259,6 @@ ini_set('display_errors', 0);
 						$('#progstatAll').attr('aria-valuenow', progstatAll);
 						$('#progstatAll').attr('style', 'width: ' + progstatAll + '%;');
 						$('#progstatAll').html(progstatAll + '%');
-					},
-					error: function (data) {
-						//
 					}
 				});
 
@@ -251,9 +275,6 @@ ini_set('display_errors', 0);
 						$('#progstatFile').attr('aria-valuenow', progstat);
 						$('#progstatFile').attr('style', 'width: ' + progstat + '%;');
 						$('#progstatFile').html(progstat + '%');
-					},
-					error: function (data) {
-						//
 					}
 				});
 			}

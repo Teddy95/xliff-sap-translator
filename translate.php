@@ -9,30 +9,42 @@ error_reporting(0);
 ini_set('display_errors', 0);
 
 // Ignoring user abort, so the script can be executed completly
-//ignore_user_abort(true);
+ignore_user_abort(true);
 
 // Deactivate timeout
 set_time_limit(0);
 
-// Function for translating source text using Google Translate API / DeepL API
+// Function for translating source text using DeepL Pro API
 function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
+	$langCodes = array(
+		'de' => 'DE',
+		'deDE' => 'DE',
+		'de-DE' => 'DE',
+		'en' => 'EN',
+		'enUS' => 'EN',
+		'en-US' => 'EN',
+		'fr' => 'FR',
+		'frFR' => 'FR',
+		'fr-FR' => 'FR'
+	);
 	$origEncoding = mb_detect_encoding($sourceText);
 	$sourceText = mb_convert_encoding($sourceText, 'UTF-8');
+	$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
+	$apiCallback = file_get_contents($apiLink);
+	
+	if ($apiCallback != '') {
+		$apiObject = json_decode($apiCallback);
+		$target = $apiObject->translations[0]->text;
+		$target = mb_convert_encoding($target, $origEncoding);
 
-	/************************************************************************/
-	/******** BEI AKTIVIERUNG SCHLEIFE AUF EINEN DURCHLAUF SETZEN!!! ********/
-	/*$apiLink = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" . $sourceLanguage . "&tl=" . $targetLanguage . "&dt=t&q=" . urlencode($sourceText);
-	$apiObject = json_decode(file_get_contents($apiLink));
-	$target = $apiObject[0][0][0];*/
-	/************************************************************************/
-	$target = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.';
-	$target = mb_convert_encoding($target, $origEncoding);
+		if (strlen($target) > $maxWidth) {
+			$target = substr($target, 0, $maxWidth);
+		}
 
-	if (strlen($target) > $maxWidth) {
-		$target = substr($target, 0, $maxWidth);
+		return $target;
+	} else {
+		return false;
 	}
-
-	return $target;
 }
 
 if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) && !empty($_POST['apikey']) && file_exists($_POST['file'])) {
@@ -59,6 +71,11 @@ if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) &
 			// Translate source
 			if (empty($target)) {
 				$target = translate($source, $srcLang, $targetLang, $maxWidth);
+
+				if ($target === false) {
+					echo 0;
+					die();
+				}
 
 				// Write down new translated text back into xml structure
 				$xmlSource->file[$i]->body->{'trans-unit'}[$n]->target = $target;
