@@ -18,7 +18,7 @@
 	display: none;
 }
 ul.listings {
-	height: 400px;
+	height: 450px;
 	overflow: auto;
 	border: 3px dashed #666666;
 }
