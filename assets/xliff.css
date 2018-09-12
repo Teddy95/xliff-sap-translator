@@ -17,7 +17,7 @@
 .after {
 	display: none;
 }
-ul.listing {
+ul.listings {
 	height: 400px;
 	overflow: auto;
 	border: 3px dashed #666666;
