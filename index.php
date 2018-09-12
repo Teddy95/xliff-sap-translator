@@ -7,6 +7,12 @@
 // Deactivate error reporting
 error_reporting(0);
 ini_set('display_errors', 0);
+
+// Ignoring user abort, so the script can be executed completly
+ignore_user_abort(true);
+
+// Deactivate timeout
+set_time_limit(0);
 ?>
 <!DOCTYPE html>
 <html>
