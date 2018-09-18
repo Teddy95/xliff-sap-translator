@@ -14,6 +14,9 @@ ignore_user_abort(true);
 // Deactivate timeout
 set_time_limit(0);
 
+// Set HTTP header to UTF-8
+header('Content-Type: text/html; charset=utf-8');
+
 // Function for translating source text using DeepL Pro API
 function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 	$langCodes = array(
@@ -27,18 +30,18 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 		'frFR' => 'FR',
 		'fr-FR' => 'FR'
 	);
-	$origEncoding = mb_detect_encoding($sourceText);
-	$sourceText = mb_convert_encoding($sourceText, 'UTF-8');
+	//$origEncoding = mb_detect_encoding($sourceText);
+	//$sourceText = mb_convert_encoding($sourceText, 'UTF-8');
 	$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
 	$apiCallback = file_get_contents($apiLink);
 	
 	if ($apiCallback != '') {
 		$apiObject = json_decode($apiCallback);
 		$target = $apiObject->translations[0]->text;
-		$target = mb_convert_encoding($target, $origEncoding);
+		//$target = mb_convert_encoding($target, $origEncoding);
 
 		if (strlen($target) > $maxWidth) {
-			$target = substr($target, 0, $maxWidth);
+			$target = str_replace(array('<', '>'), '', substr($target, 0, $maxWidth));
 		}
 
 		return $target;
@@ -112,7 +115,7 @@ if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) &
 	$output = $xmlSource->asXML();
 	$newFile = './target/' . basename($file);
 	$fileHandle = fopen($newFile, 'w');
-	fwrite($fileHandle, $output);
+	fwrite($fileHandle, utf8_decode($output));
 	fclose($fileHandle);
 
 	echo 1;
