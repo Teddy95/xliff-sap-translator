@@ -115,7 +115,7 @@ if (isset($_POST['file']) && !empty($_POST['file']) && isset($_POST['apikey']) &
 	$output = $xmlSource->asXML();
 	$newFile = './target/' . basename($file);
 	$fileHandle = fopen($newFile, 'w');
-	fwrite($fileHandle, utf8_decode($output));
+	fwrite($fileHandle, $output);
 	fclose($fileHandle);
 
 	echo 1;
