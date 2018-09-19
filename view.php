@@ -34,7 +34,7 @@ $files = glob('./target/*.xlf');
 					</tr>
 					<?php
 					// Get xml source from file
-					$xmlSource = new SimpleXMLElement(utf8_encode(file_get_contents($file)));
+					$xmlSource = new SimpleXMLElement(file_get_contents($file));
 
 					for ($i = 0, $j = count($xmlSource->file); $i < $j; $i++) {
 						$srcLang = $xmlSource->file[$i]->attributes()->{'source-language'};
