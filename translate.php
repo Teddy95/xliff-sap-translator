@@ -40,7 +40,7 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 		$target = $apiObject->translations[0]->text;
 
 		if (mb_strlen($target, 'utf-8') > $maxWidth) {
-			$target = str_replace(array('<', '>'), '', substr($target, 0, $maxWidth));
+			$target = substr($target, 0, $maxWidth);
 		}
 
 		return $target;
