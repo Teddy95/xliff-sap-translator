@@ -1,7 +1,7 @@
 <?php
 /**
  * Author: Andre Sieverding
- * Date: 05.09.2018
+ * Date: 19.09.2018
  */
 
 // Deactivate error reporting
@@ -31,8 +31,8 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 		'fr-FR' => 'FR'
 	);
 
-	$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
-	//$apiLink = "http://localhost/xliff/sandbox_api.php?string=" . urlencode($sourceText); # API-Link for sandbox mode
+	//$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
+	$apiLink = "http://localhost/xliff/sandbox_api.php?string=" . urlencode($sourceText); # API-Link for sandbox mode
 	$apiCallback = file_get_contents($apiLink);
 	
 	if ($apiCallback != '') {

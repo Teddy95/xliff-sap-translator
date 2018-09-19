@@ -1,7 +1,7 @@
 <?php
 /**
  * Author: Andre Sieverding
- * Date: 05.09.2018
+ * Date: 19.09.2018
  */
 
 // Deactivate error reporting
@@ -69,14 +69,14 @@ set_time_limit(0);
 					<div class="col-12">
 						<br />
 						<h1>XLIFF SAP Translator</h1>
-						<button type="button" id="startTranslating" class="btn btn-primary before"><i class="fa fa-language"></i> Übersetzung beginnen</button>
-						<a class="btn btn-secondary after" href="./index.php"><i class="fa fa-broom"></i> Neu laden</a>
-						<a class="btn btn-primary after" href="./view.php" target="_blank"><i class="fa fa-eye"></i> Ergebnisse anzeigen</a>
+						<button type="button" id="startTranslating" class="btn btn-primary before"><i class="fa fa-language"></i> Start Translation</button>
+						<a class="btn btn-secondary after" href="./index.php"><i class="fa fa-broom"></i> Reload</a>
+						<a class="btn btn-primary after" href="./view.php" target="_blank"><i class="fa fa-eye"></i> Show Results</a>
 						<br />
 						<br />
 					</div>
 					<div class="col">
-						<h3>Zu übersetzende Dateien:</h3>
+						<h3>Files for translating:</h3>
 						<ul class="listings">
 							<?php
 							for ($i = 0, $j = count($files); $i < $j; $i++) {
@@ -86,28 +86,28 @@ set_time_limit(0);
 						</ul>
 					</div>
 					<div class="col">
-						<h3>Übersetzungsinfo:</h3>
+						<h3>Translation info:</h3>
 						<p>
 							<?php
 							$langs = array(
-								'de' => 'Deutsch',
-								'DE' => 'Deutsch',
-								'deDE' => 'Deutsch',
-								'de-DE' => 'Deutsch',
-								'en' => 'Englisch',
-								'EN' => 'Englisch',
-								'enUS' => 'Englisch',
-								'en-US' => 'Englisch',
-								'fr' => 'Französisch',
-								'FR' => 'Französisch',
-								'frFR' => 'Französisch',
-								'fr-FR' => 'Französisch'
+								'de' => 'German',
+								'DE' => 'German',
+								'deDE' => 'German',
+								'de-DE' => 'German',
+								'en' => 'English',
+								'EN' => 'English',
+								'enUS' => 'English',
+								'en-US' => 'English',
+								'fr' => 'French',
+								'FR' => 'French',
+								'frFR' => 'French',
+								'fr-FR' => 'French'
 							);
 							?>
-							Quellsprache: <b>
+							Source Language: <b>
 								<?php
 								for ($i = 0, $j = count($srcLang); $i < $j; $i++) {
-									echo $langs[$srcLang[$i]];
+									echo isset($langs[$srcLang[$i]]) ? $langs[$srcLang[$i]] : $srcLang[$i];
 
 									if ($j - 1 != $i) {
 										echo '; ';
@@ -115,10 +115,10 @@ set_time_limit(0);
 								}
 								?>
 								</b><br />
-							Zielsprache: <b>
+							Target Language: <b>
 								<?php
 								for ($i = 0, $j = count($targetLang); $i < $j; $i++) {
-									echo $langs[$targetLang[$i]];
+									echo isset($langs[$targetLang[$i]]) ? $langs[$targetLang[$i]] : $targetLang[$i];
 
 									if ($j - 1 != $i) {
 										echo '; ';
@@ -128,38 +128,38 @@ set_time_limit(0);
 								</b>
 						</p>
 						<p>
-							Anzahl Texte: <b><?=number_format($texts, 0, ',', '.');?></b><br />
-							Anzahl Zeichen: <b><?=number_format($chars, 0, ',', '.');?></b>
+							Number of texts: <b><?=number_format($texts, 0, '.', ',');?></b><br />
+							Number of characters: <b><?=number_format($chars, 0, '.', ',');?></b>
 						</p>
 						<p>
-							Kosten ca.: <b><?=number_format($costs, 2, ',', '.');?></b> EUR (20,00 € / 1 Mio. Zeichen)
+							Costs approx: <b><?=number_format($costs, 2, '.', ',');?></b> EUR (20.00 € / 1 million characters)
 						</p>
 						<hr />
 						<div class="before change">
 							<p>
 								<form>
 									<div class="form-group">
-										<label for="exampleInputEmail1"><b>DeepL Pro API Schlüssel</b></label>
+										<label for="exampleInputEmail1"><b>DeepL Pro API Key</b></label>
 										<input type="text" class="form-control" id="apikey" />
-										<small class="form-text text-muted">Der API Schlüssel wird benötigt, um auf den Service von DeepL zuzugreifen!</small>
+										<small class="form-text text-muted">The API key is required for using DeepL translation service!</small>
 									</div>
 									<div class="form-group form-check">
 										<input type="checkbox" class="form-check-input" id="emptyTarget" checked="checked" />
-										<label class="form-check-label" for="emptyTarget"><code>/target</code>-Verzeichnis vor dem Übersetzen leeren</label>
+										<label class="form-check-label" for="emptyTarget">Empty <code>/target</code>-directory before translating</label>
 									</div>
 								</form>
 							</p>
 						</div>
 						<div class="after change">
 							<p>
-								Fortschritt aktuelle Datei
+								Progress current file
 							</p>
 							<div class="progress">
 								<div id="progstatFile" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">0%</div>
 							</div>
 							<br />
 							<p>
-								Fortschritt Gesamt
+								Progress overall
 							</p>
 							<div class="progress">
 								<div id="progstatAll" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">0%</div>
@@ -175,8 +175,8 @@ set_time_limit(0);
 						<br />
 						<h1>XLIFF SAP Translator</h1>
 						<p class="alert alert-info">
-							Keine Dateien zum Übersetzen vorhanden!<br />
-							Bitte <code>.xlf</code>-Dateien in das <code>/src</code> Verzeichnis legen.
+							No files for translating available!<br />
+							Put <code>.xlf</code>-files into the <code>/src</code>-directory.
 						</p>
 					</div>
 				</div>
@@ -201,7 +201,7 @@ set_time_limit(0);
 				$('#startTranslating').off();
 				$('#startTranslating').click(function () {
 					if ($('#apikey').val() != '') {
-						if (confirm("Übersetzung kostenpflichtig starten? Dieser Vorgang kann nicht abgerochen werden und wird einige Zeit zur Ausführung benötigen!")) {
+						if (confirm("Start translation for a fee? This process cannot be aborted and will take some time to complete!")) {
 							$('#startTranslating').attr('disabled', 'disabled').addClass('disabled');
 							$('.before.change').hide();
 							$('.after.change').show();
@@ -326,7 +326,7 @@ set_time_limit(0);
 								updateProg();
 								$('.before').hide();
 								$('.after').show();
-								alert("Übersetzung abgeschlossen!")
+								alert("Translation completed!")
 							}
 						}
 					});

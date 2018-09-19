@@ -1,7 +1,7 @@
 <?php
 /**
  * Author: Andre Sieverding
- * Date: 05.09.2018
+ * Date: 19.09.2018
  */
 
 // Deactivate error reporting

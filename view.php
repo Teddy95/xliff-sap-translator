@@ -1,7 +1,7 @@
 <?php
 /**
  * Author: Andre Sieverding
- * Date: 05.09.2018
+ * Date: 19.09.2018
  */
 
 // Read files from source file directory
@@ -19,9 +19,9 @@ $files = glob('./target/*.xlf');
 		<table class="table table-striped table-dark">
 			<thead>
 				<tr>
-					<th>Quellsprache</th>
-					<th>Zielsprache</th>
-					<th>Max. Länge</th>
+					<th>Source Language</th>
+					<th>Target Language</th>
+					<th>Max. Length</th>
 				</tr>
 			</thead>
 			<tbody>
