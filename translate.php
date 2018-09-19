@@ -30,17 +30,16 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 		'frFR' => 'FR',
 		'fr-FR' => 'FR'
 	);
-	//$origEncoding = mb_detect_encoding($sourceText);
-	//$sourceText = mb_convert_encoding($sourceText, 'UTF-8');
+
 	$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
+	//$apiLink = "http://localhost/xliff/sandbox_api.php?string=" . urlencode($sourceText); # API-Link for sandbox mode
 	$apiCallback = file_get_contents($apiLink);
 	
 	if ($apiCallback != '') {
 		$apiObject = json_decode($apiCallback);
 		$target = $apiObject->translations[0]->text;
-		//$target = mb_convert_encoding($target, $origEncoding);
 
-		if (strlen($target) > $maxWidth) {
+		if (mb_strlen($target, 'utf-8') > $maxWidth) {
 			$target = str_replace(array('<', '>'), '', substr($target, 0, $maxWidth));
 		}
 
