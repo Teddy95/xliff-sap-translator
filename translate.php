@@ -28,7 +28,19 @@ function translate ($sourceText, $sourceLanguage, $targetLanguage, $maxWidth) {
 		'en-US' => 'EN',
 		'fr' => 'FR',
 		'frFR' => 'FR',
-		'fr-FR' => 'FR'
+		'fr-FR' => 'FR',
+		'es' => 'ES',
+		'esES' => 'ES',
+		'es-ES' => 'ES',
+		'it' => 'IT',
+		'itIT' => 'IT',
+		'it-IT' => 'IT',
+		'nl' => 'NL',
+		'nlNL' => 'NL',
+		'nl-NL' => 'NL',
+		'pl' => 'PL',
+		'plPL' => 'PL',
+		'pl-PL' => 'PL'
 	);
 
 	$apiLink = "https://api.deepl.com/v1/translate?auth_key=" . $_POST['apikey'] . "&text=" . urlencode($sourceText) . "&source_lang=" . $langCodes[$sourceLanguage] . "&target_lang=" . $langCodes[$targetLanguage];
