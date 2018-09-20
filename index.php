@@ -102,6 +102,22 @@ set_time_limit(0);
 								'FR' => 'French',
 								'frFR' => 'French',
 								'fr-FR' => 'French'
+								'es' => 'Spanish',
+								'ES' => 'Spanish',
+								'esES' => 'Spanish',
+								'es-ES' => 'Spanish'
+								'it' => 'Italian',
+								'IT' => 'Italian',
+								'itIT' => 'Italian',
+								'it-IT' => 'Italian'
+								'ni' => 'Dutch',
+								'NI' => 'Dutch',
+								'niNI' => 'Dutch',
+								'ni-NI' => 'Dutch'
+								'pl' => 'Polish',
+								'PL' => 'Polish',
+								'plPL' => 'Polish',
+								'pl-PL' => 'Polish'
 							);
 							?>
 							Source Language: <b>
