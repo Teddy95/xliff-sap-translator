@@ -10,4 +10,4 @@ Translate .xlf files using DeepL Translator API for SAP
 
 ### Tested successfully with DeepL Pro API v1 and SAP NetWeaver Version 7400.3.12.1129
 
-Supported languages: Englisch, German, French
+Supported languages: Englisch, German, French, Spanish, Italian, Dutch, Polish
